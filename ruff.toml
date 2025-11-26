@@ -1,9 +1,14 @@
+# ========================================================
+# Global Ruff Configuration
+# ========================================================
+
 extend-exclude = [
     "numpy/__config__.py",
     "numpy/distutils",
     "numpy/typing/_char_codes.py",
     "spin/cmds.py",
-    # Submodules.
+
+    # Submodules & vendored code
     "doc/source/_static/scipy-mathjax",
     "vendored-meson/meson",
     "numpy/fft/pocketfft",
@@ -13,11 +18,20 @@ extend-exclude = [
     "numpy/_core/src/common/pythoncapi-compat",
 ]
 
+extend-include = ["*.py", "*.pyi"]
+
 line-length = 88
 
+# --------------------------------------------------------
+# Formatting
+# --------------------------------------------------------
 [format]
 line-ending = "lf"
+indent-style = "space"
 
+# ========================================================
+# Lint Configuration
+# ========================================================
 [lint]
 preview = true
 extend-select = [
@@ -39,48 +53,43 @@ extend-select = [
     "PLE",  # pylint/error
     "UP",   # pyupgrade
 ]
+
 ignore = [
     # flake8-bugbear
-    "B006",    # Do not use mutable data structures for argument defaults
-    "B007",    # Loop control variable not used within loop body
-    "B011",    # Do not `assert False` (`python -O` removes these calls), raise `AssertionError()`
-    "B023",    # Function definition does not bind loop variable
-    "B028",    # No explicit `stacklevel` keyword argument found
-    "B904",    # Within an `except` clause distinguish raised exceptions from errors in exception handling
-    "B905",    #`zip()` without an explicit `strict=` parameter
+    "B006", "B007", "B011", "B023", "B028", "B904", "B905",
+
     # flake8-comprehensions
-    "C408",    # Unnecessary `dict()` call (rewrite as a literal)
+    "C408",
+
     # flake8-implicit-str-concat
-    "ISC002",  # Implicitly concatenated string literals over multiple lines
+    "ISC002",
+
     # flake8-pie
-    "PIE790",  # Unnecessary `pass` statement
+    "PIE790",
+
     # perflint
-    "PERF401", # Use a list comprehension to create a transformed list
+    "PERF401",
+
     # pycodestyle/error
-    "E241",    # Multiple spaces after comma
-    "E265",    # Block comment should start with `# `
-    "E266",    # Too many leading `#` before block comment
-    "E302",    # TODO: Expected 2 blank lines, found 1
-    "E402",    # Module level import not at top of file
-    "E712",    # Avoid equality comparisons to `True` or `False`
-    "E721",    # TODO: Use `is` and `is not` for type comparisons, or `isinstance()` for isinstance check
-    "E731",    # Do not assign a `lambda` expression, use a `def`
-    "E741",    # Ambiguous variable name
+    "E241", "E265", "E266", "E302", "E402", "E712",
+    "E721", "E731", "E741",
+
     # pyflakes
-    "F403",    # `from ... import *` used; unable to detect undefined names
-    "F405",    # may be undefined, or defined from star imports
-    "F821",    # Undefined name
-    "F841",    # Local variable is assigned to but never used
+    "F403", "F405", "F821", "F841",
+
     # pyupgrade
-    "UP015" ,  # Unnecessary mode argument
-    "UP031",   # TODO: Use format specifiers instead of percent format
+    "UP015", "UP031",
 ]
 
+# ========================================================
+# Per-file Ignores
+# ========================================================
 [lint.per-file-ignores]
 "_tempita.py" = ["B909"]
 "bench_*.py" = ["B015", "B018"]
 "test*.py" = ["B015", "B018", "E201", "E714"]
 
+# Long-line exceptions for specific NumPy test files
 "numpy/_core/tests/test_arrayprint.py" = ["E501"]
 "numpy/_core/tests/test_cpu_dispatcher.py" = ["E501"]
 "numpy/_core/tests/test_cpu_features.py" = ["E501"]
@@ -98,15 +107,19 @@ ignore = [
 "numpy/lib/tests/test_format.py" = ["E501"]
 "numpy/linalg/tests/test_linalg.py" = ["E501"]
 "numpy/f2py/*py" = ["E501"]
-# for typing related files we follow https://typing.python.org/en/latest/guides/writing_stubs.html#maximum-line-length
+
+# Typing guidelines — allow long lines
 "numpy/_typing/_array_like.py" = ["E501"]
 "numpy/_typing/_dtype_like.py" = ["E501"]
 "numpy*pyi" = ["E501"]
-# "useless assignments" aren't so useless when you're testing that they don't make type checkers scream
+
+# Useless assignments allowed inside typing tests
 "numpy/typing/tests/data/*" = ["B015", "B018", "E501"]
-# too disruptive to enable all at once
+
+# Disable quotes check globally (too disruptive)
 "**/*.py" = ["Q"]
 
+# Module-level ignores
 "__init__.py" = ["F401", "F403", "F405"]
 "__init__.pyi" = ["F401"]
 "numpy/_core/defchararray.py" = ["F403", "F405"]
@@ -120,15 +133,19 @@ ignore = [
 "numpy/matlib.py" = ["F405"]
 "numpy/matlib.pyi" = ["F811"]
 
+# ========================================================
+# Plugin-specific Settings
+# ========================================================
+
 [lint.flake8-builtins]
 builtins-allowed-modules = ["random", "typing"]
 
 [lint.flake8-import-conventions.extend-aliases]
 "numpy" = "np"
 "numpy.typing" = "npt"
+"typing_extensions" = "te"
 
 [lint.isort]
-# these are treated as stdlib within .pyi stubs
 extra-standard-library = ["_typeshed", "typing_extensions"]
 known-first-party = ["numpy"]
 combine-as-imports = true
